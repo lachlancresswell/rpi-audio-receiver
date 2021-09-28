@@ -74,6 +74,7 @@ ExecStartPre=/bin/sleep 2
 ExecStart=/usr/bin/bluealsa-aplay --pcm-buffer-time=250000 00:00:00:00:00:00
 RestartSec=5
 Restart=always
+User=$USER
 
 [Install]
 WantedBy=multi-user.target
@@ -105,4 +106,28 @@ chmod 755 /usr/local/bin/bluetooth-udev
 cat <<'EOF' > /etc/udev/rules.d/99-bluetooth-udev.rules
 SUBSYSTEM=="input", GROUP="input", MODE="0660"
 KERNEL=="input[0-9]*", RUN+="/usr/local/bin/bluetooth-udev"
+EOF
+
+# Redirect ALSA stream to Snapcast FIFO
+cat <<'EOF' > ~/.asound.rc
+pcm.!default {
+    type plug
+    slave.pcm rate48000Hz
+}
+
+pcm.rate48000Hz {
+    type rate
+    slave {
+        pcm writeFile # Direct to the plugin which will write to a file
+        format S16_LE
+        rate 48000
+    }
+}
+
+pcm.writeFile {
+    type file
+    slave.pcm null
+    file "/tmp/snapcast-bluetoothfifo"
+    format "raw"
+}
 EOF

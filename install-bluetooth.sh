@@ -10,6 +10,7 @@ if [[ ! "$REPLY" =~ ^(yes|y|Y)$ ]]; then exit 0; fi
 apt install -y --no-install-recommends alsa-base alsa-utils bluealsa bluez-tools
 
 # Bluetooth settings
+cp /etc/bluetooth/main.conf /etc/bluetooth/main.conf.bak
 cat <<'EOF' > /etc/bluetooth/main.conf
 [General]
 Class = 0x200414
@@ -47,6 +48,7 @@ EOF
 systemctl enable bt-agent@hci0.service
 
 # ALSA settings
+cp /lib/modprobe.d/aliases.conf /lib/modprobe.d/aliases.conf.bak
 sed -i.orig 's/^options snd-usb-audio index=-2$/#options snd-usb-audio index=-2/' /lib/modprobe.d/aliases.conf
 
 # BlueALSA

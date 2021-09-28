@@ -61,7 +61,7 @@ RestartSec=5
 Restart=always
 EOF
 
-cat <<'EOF' > /etc/systemd/system/bluealsa-aplay.service
+cat <<EOF > /etc/systemd/system/bluealsa-aplay.service
 [Unit]
 Description=BlueALSA aplay
 Requires=bluealsa.service
